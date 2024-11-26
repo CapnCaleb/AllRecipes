@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "CachedImageService.fetchRemoteImage(using:):CachedImageService.swift">
+      </ContextState>
+      <ContextState
+         contextName = "RecipesTests.decodeRecipe(jsonString:):AllRecipesTests.swift">
+      </ContextState>
+      <ContextState
+         contextName = "LoadingImageView.handleState(imageURL:retry:):LoadingImageView.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

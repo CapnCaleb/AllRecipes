@@ -10,9 +10,9 @@ import Testing
 
 @testable import AllRecipes
 
-struct RecipeResponseTests {
-    
-    @Test("Testing JSON Decoding Success", arguments: [
+class RecipeResponseTests {
+    //MARK: Testing Success
+    @Test("JSON Decoding Success", arguments: [
         RecipeResponse.jsonStringFull,
         RecipeResponse.jsonStringMinimum
     ])
@@ -23,7 +23,30 @@ struct RecipeResponseTests {
         #expect(recipeResponse.recipes.count > 0)
     }
     
-    @Test("Testing JSON Decoding Failure", arguments: [
+    @Test("Good Demo Response Success")
+    func decodeGoodDemoResponse() throws {
+        let bundle = Bundle(for: RecipeResponseTests.self)
+        let path = bundle.path(forResource: "GoodResponse", ofType: "json")!
+        let url = URL(filePath: path, directoryHint: .inferFromPath)
+        let data = try Data(contentsOf: url)
+        
+        let recipeResponse = try JSONDecoder().decode(RecipeResponse.self, from: data)
+        #expect(!recipeResponse.recipes.isEmpty)
+    }
+    
+    @Test("Empty Demo Response Success")
+    func decodeEmptyDemoResponse() throws {
+        let bundle = Bundle(for: RecipeResponseTests.self)
+        let path = bundle.path(forResource: "EmptyResponse", ofType: "json")!
+        let url = URL(filePath: path, directoryHint: .inferFromPath)
+        let data = try Data(contentsOf: url)
+        
+        let recipeResponse = try JSONDecoder().decode(RecipeResponse.self, from: data)
+        #expect(recipeResponse.recipes.isEmpty)
+    }
+    
+    //MARK: Testing Failure
+    @Test("JSON Decoding Failure", arguments: [
         RecipeResponse.jsonStringBadKey,
         RecipeResponse.jsonStringBadValue
     ])
@@ -35,9 +58,21 @@ struct RecipeResponseTests {
             try JSONDecoder().decode(RecipeResponse.self, from: json)
         }
     }
+    
+    @Test("Malformed Response Failure")
+    func decodeBadResponse() throws {
+        let bundle = Bundle(for: RecipeResponseTests.self)
+        let path = bundle.path(forResource: "MalformedResponse", ofType: "json")!
+        let url = URL(filePath: path, directoryHint: .inferFromPath)
+        let data = try Data(contentsOf: url)
+        
+        #expect(throws: DecodingError.self) {
+            try JSONDecoder().decode(RecipeResponse.self, from: data)
+        }
+    }
 }
 
-//MARK: Recipe RecipeResponse
+//MARK: RecipeResponse JSON
 private extension RecipeResponse {
     static let jsonStringFull =
     """

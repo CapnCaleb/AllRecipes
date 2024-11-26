@@ -8,13 +8,18 @@
 import Foundation
 
 struct NetworkManager {
-    static func performRequest<T: Decodable>(_ request: APIRequest, responseType: T.Type) async throws -> T {
+    static func performRequest(_ request: APIRequest) async throws -> Data {
         var urlRequest = URLRequest(url: request.url)
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.allHTTPHeaderFields = request.headers
         urlRequest.httpBody = request.body
-
+        
         let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        return data
+    }
+    
+    static func performRequest<T: Decodable>(_ request: APIRequest, responseType: T.Type) async throws -> T {
+        let data = try await performRequest(request) // Reuse the raw data method
         return try JSONDecoder().decode(T.self, from: data)
     }
 }
