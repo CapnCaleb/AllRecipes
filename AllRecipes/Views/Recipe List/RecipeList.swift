@@ -8,55 +8,49 @@
 import SwiftUI
 
 struct RecipeList: View {
-    @State private var recipes: [Recipe] = []
-    @State private var loadingState: LoadingState = .loading
-    
+    @StateObject private var viewModel = RecipeListViewModel()
+
     var body: some View {
         NavigationStack {
-            List(recipes) { recipe in
-                NavigationLink {
-                    RecipeDetail(recipe: recipe)
-                } label: {
-                    RecipeItem(recipe: recipe)
-                }
-
+            VStack {
+                recipeList
             }
-            .refreshable {
-                await fetchAllRecipes()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .bottomTrailing) {
+                RefreshButton(action: viewModel.fetchAllRecipes)
+                    .padding(.horizontal)
             }
-            .overlay(alignment: .bottomTrailing, content: {
-                RefreshButton {
-                    await fetchAllRecipes()
-                }
-                .padding(.horizontal)
-            })
+            .overlay(alignment: .center) {
+                ResponseStateView(isLoading: viewModel.isLoading,
+                                  loadingError: viewModel.loadingError,
+                                  recipeCount: viewModel.recipes.count)
+            }
             .navigationTitle("All Recipes")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EndpointMenu(selectedOption: $viewModel.recipeEndpointOption)
+                }
+            }
+            .onChange(of: viewModel.recipeEndpointOption) { _, _ in
+                viewModel.fetchAllRecipes()
+            }
             .task {
-                await fetchAllRecipes()
+                viewModel.fetchAllRecipes()
             }
         }
     }
     
-    enum LoadingState {
-        case loading
-        case failure
-        case complete
-    }
-}
-
-extension RecipeList {
-    func fetchAllRecipes() async {
-        await MainActor.run { loadingState = .loading }
-        do {
-            let recipeResponse = try await RecipeAPI.getRecipes()
-            await MainActor.run {
-                recipes = recipeResponse.recipes
-                loadingState = .complete
+    private var recipeList: some View {
+        List(viewModel.recipes) { recipe in
+            NavigationLink {
+                RecipeDetail(recipe: recipe)
+            } label: {
+                RecipeItem(recipe: recipe)
             }
-        } catch {
-            await MainActor.run { loadingState = .failure }
+        }
+        .listStyle(.plain)
+        .refreshable {
+            viewModel.fetchAllRecipes()
         }
     }
-    
-    
 }

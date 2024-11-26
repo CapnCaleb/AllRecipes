@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RefreshButton: View {
-    @State private var isLoading: Bool = false
+    @State var isLoading: Bool = false
     @State private var rotationEffect: Double = 0
     
     let action: (() -> Void)?
@@ -31,6 +31,8 @@ struct RefreshButton: View {
             if isLoading {
                 ProgressView()
                     .progressViewStyle(.circular)
+                    .foregroundStyle(.white)
+                    .frame(width: 54, height: 54)
             } else {
                 Image(systemName: "arrow.circlepath")
                     .font(.largeTitle)
@@ -44,7 +46,7 @@ struct RefreshButton: View {
             }
         })
         .background(.blue.gradient)
-        
+        .frame(width: 54, height: 54)
         .clipShape(Circle())
         .disabled(isLoading)
         .shadow(radius: 8)
@@ -71,6 +73,7 @@ struct RefreshButton: View {
 
 #Preview {
     RefreshButton {
-        print("")
+        do { try await Task.sleep(for: .seconds(5)) }
+        catch { print(error) }
     }
 }
