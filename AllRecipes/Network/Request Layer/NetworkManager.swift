@@ -19,7 +19,7 @@ struct NetworkManager {
     }
     
     static func performRequest<T: Decodable>(_ request: APIRequest, responseType: T.Type) async throws -> T {
-        let data = try await performRequest(request) // Reuse the raw data method
+        let data = try await performRequest(request)
         return try JSONDecoder().decode(T.self, from: data)
     }
 }

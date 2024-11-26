@@ -8,15 +8,16 @@
 import UIKit
 
 public actor FileManagerImageCaching {
-    private let imageCacheSubdirectory: String
-    private let fileManager = FileManager.default
+    private let fileManager: FileManager
+    private let cacheDirectoryURL: URL?
     
     public init(cacheName: String = "ImageCache") {
-        self.imageCacheSubdirectory = cacheName
+        fileManager = FileManager.default
+        cacheDirectoryURL = FileManagerImageCaching.cacheDirectoryURL(fileManager: FileManager.default, imageCacheSubdirectory: cacheName)
     }
     
     public func cache(image: UIImage, using url: URL) async {
-        guard let cacheDirectoryURL = await cacheDirectoryURL() else {
+        guard let cacheDirectoryURL = cacheDirectoryURL else {
             return
         }
         
@@ -47,7 +48,7 @@ public actor FileManagerImageCaching {
     }
     
     public func fetch(using url: URL) async -> UIImage? {
-        guard let cacheDirectoryURL = await cacheDirectoryURL() else {
+        guard let cacheDirectoryURL = cacheDirectoryURL else {
             return nil
         }
         
@@ -64,21 +65,16 @@ public actor FileManagerImageCaching {
         return nil
     }
     
-    public func clearCache() async {
-        guard let cacheDirectoy = await self.cacheDirectoryURL() else { return }
+    public func clearCache() async throws {
+        guard let cacheDirectoryURL else { return }
             
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(at: cacheDirectoy, includingPropertiesForKeys: nil, options: [])
-            for fileURL in fileURLs {
-                try fileManager.removeItem(at: fileURL)
-            }
-            print("All files deleted successfully.")
-        } catch {
-            print("Error deleting files: \(error)")
+        let fileURLs = try fileManager.contentsOfDirectory(at: cacheDirectoryURL, includingPropertiesForKeys: nil, options: [])
+        for fileURL in fileURLs {
+            try fileManager.removeItem(at: fileURL)
         }
     }
     
-    private func cacheDirectoryURL() async -> URL? {
+    private static func cacheDirectoryURL(fileManager: FileManager, imageCacheSubdirectory: String) -> URL? {
         guard let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
             return nil
         }
