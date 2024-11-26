@@ -11,24 +11,19 @@ import Testing
 @testable import AllRecipes
 
 struct FileManagerDataCachingTests {
-    private let cacheName = "MockCache"
     
     @Test("Testing inits for different init options")
     func initalSetup() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: cacheName)
+        let cache: FileManagerDataCaching = try FileManagerDataCaching()
         
         #expect(cache != nil)
-        
-        let cache2: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager)
-        
-        #expect(cache2 != nil)
     }
     
     @Test("Test Caching Data Success")
     func cachDataSuccess() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: cacheName)
+        let cache: FileManagerDataCaching = try FileManagerDataCaching()
         
         let testData = "Hello, Cache!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource1")!
@@ -43,7 +38,7 @@ struct FileManagerDataCachingTests {
     @Test("Test Fetching Data Success")
     func fetchDataSuccess() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: cacheName)
+        let cache: FileManagerDataCaching = try FileManagerDataCaching()
         
         let testData = "Hello, Fetch!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource2")!
@@ -59,7 +54,7 @@ struct FileManagerDataCachingTests {
     @Test("Test Clearing Cache")
     func clearCache() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: cacheName)
+        let cache: FileManagerDataCaching = try FileManagerDataCaching()
         
         let testData = "Hello, Clear!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource3")!

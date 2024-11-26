@@ -12,9 +12,9 @@ public actor FileManagerDataCaching {
     private let fileManager: FileManager
     private let cacheDirectoryURL: URL?
     
-    public init(fileManager: FileManager = .default, cacheName: String = "DataCache") throws {
-        self.fileManager = fileManager
-        self.cacheDirectoryURL = try FileManagerDataCaching.cacheDirectoryURL(fileManager: fileManager, dataCacheName: cacheName)
+    public init() throws {
+        self.fileManager = FileManager.default
+        self.cacheDirectoryURL = try FileManagerDataCaching.cacheDirectoryURL(fileManager: fileManager)
     }
     
     public func cache(data: Data, using url: URL) async {
@@ -51,12 +51,12 @@ public actor FileManagerDataCaching {
         return cacheDirectoryURL.appendingPathComponent(hashedFileName).path()
     }
     
-    static func cacheDirectoryURL(fileManager: FileManager, dataCacheName: String) throws -> URL? {
+    static func cacheDirectoryURL(fileManager: FileManager) throws -> URL? {
         guard let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first else {
             return nil
         }
         
-        let imageCacheDirectory = cachesDirectory.appendingPathComponent(dataCacheName)
+        let imageCacheDirectory = cachesDirectory.appendingPathComponent("DataCache")
         
         if !fileManager.fileExists(atPath: imageCacheDirectory.path) {
             try fileManager.createDirectory(at: imageCacheDirectory, withIntermediateDirectories: true, attributes: nil)

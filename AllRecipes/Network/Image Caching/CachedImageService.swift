@@ -10,10 +10,11 @@ import UIKit
 public actor CachedImageService {
     static let shared = CachedImageService()
     private var iconCache = [String : UIImage]()
-    private let fileManagerCache: FileManagerImageCaching
+    private let fileManagerCache: FileManagerDataCaching
     
-    public init(cacheName: String = "ImageCache") {
-        self.fileManagerCache = FileManagerImageCaching(cacheName: cacheName)
+    
+    public init() {
+        self.fileManagerCache = try! FileManagerDataCaching()
     }
     
     public func getImage(for url: URL?) async throws -> UIImage? {
@@ -30,14 +31,16 @@ extension CachedImageService {
             return image
         }
         
-        if let image = await fileManagerCache.fetch(using: url) {
+        if let data = await fileManagerCache.fetch(using: url), let image = UIImage(data: data) {
             await cacheImageInDictionary(url: url, image: image)
             return image
         }
 
         if let image = try await fetchRemoteImage(using: url) {
             await cacheImageInDictionary(url: url, image: image)
-            await fileManagerCache.cache(image: image, using: url)
+            if let imageData = image.jpegData(compressionQuality: 1.0) {
+                await fileManagerCache.cache(data: imageData, using: url)
+            }
             return image
         }
         
@@ -45,7 +48,7 @@ extension CachedImageService {
     }
     
     private func fetchFromDictionary(with url: URL) async -> UIImage? {
-        return self.iconCache[getHashedName(with: url)]
+        return self.iconCache[url.hashedName()]
     }
     
     private func fetchRemoteImage(using url: URL) async throws -> UIImage? {
@@ -59,14 +62,7 @@ extension CachedImageService {
 //MARK: Caching
 extension CachedImageService {
     private func cacheImageInDictionary(url: URL, image: UIImage) async {
-        self.iconCache[getHashedName(with: url)] = image
-    }
-}
-
-//MARK: Supporting Functions
-extension CachedImageService {
-    private func getHashedName(with url: URL) -> String {
-        url.absoluteString.sha256()
+        self.iconCache[url.hashedName()] = image
     }
 }
 
