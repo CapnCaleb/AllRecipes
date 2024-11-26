@@ -14,7 +14,7 @@ struct RecipeItem: View {
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 0) {
                 makeTitleView(title: recipe.name)
-                makeDescriptionView(description: recipe.cuisine)
+                makeDescriptionView(description: "Cuisine: \(recipe.cuisine)")
             }
             
             if recipe.photoURLSmall != nil {
