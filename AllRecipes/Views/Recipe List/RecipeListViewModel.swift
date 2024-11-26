@@ -12,6 +12,12 @@ final class RecipeListViewModel: ObservableObject {
     @Published var loadingError: Error?
     @Published var recipeEndpointOption: EndpointOption = .main
 
+    private let api: RecipeAPIProtocol
+    
+    init(api: RecipeAPIProtocol = RecipeAPI()) {
+        self.api = api
+    }
+    
     enum EndpointOption: String, CaseIterable {
         case main, malformed, empty
 
@@ -25,9 +31,9 @@ final class RecipeListViewModel: ObservableObject {
             do {
                 let recipeResponse: RecipeResponse = try await {
                     switch recipeEndpointOption {
-                    case .main: return try await RecipeAPI.getRecipes()
-                    case .malformed: return try await RecipeAPI.getMalformedRecipes()
-                    case .empty: return try await RecipeAPI.getEmptyRecipes()
+                    case .main: return try await api.getRecipes()
+                    case .malformed: return try await api.getMalformedRecipes()
+                    case .empty: return try await api.getEmptyRecipes()
                     }
                 }()
                 await MainActor.run {
