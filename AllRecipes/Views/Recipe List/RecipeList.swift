@@ -17,7 +17,9 @@ struct RecipeList: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .bottomTrailing) {
-                RefreshButton(action: viewModel.fetchAllRecipes)
+                RefreshButton{
+                    await viewModel.fetchAllRecipes()
+                }
                     .padding(.horizontal)
             }
             .overlay(alignment: .center) {
@@ -32,10 +34,10 @@ struct RecipeList: View {
                 }
             }
             .onChange(of: viewModel.recipeEndpointOption) { _, _ in
-                viewModel.fetchAllRecipes()
+                Task { await viewModel.fetchAllRecipes() }
             }
             .task {
-                viewModel.fetchAllRecipes()
+                Task { await viewModel.fetchAllRecipes() }
             }
         }
     }
@@ -50,7 +52,7 @@ struct RecipeList: View {
         }
         .listStyle(.plain)
         .refreshable {
-            viewModel.fetchAllRecipes()
+            await viewModel.fetchAllRecipes()
         }
     }
 }

@@ -5,7 +5,10 @@
 //  Created by Caleb on 11/26/24.
 //
 
+
 import Foundation
+import Testing
+@testable import AllRecipes
 
 struct MockRecipeAPI: RecipeAPIProtocol {
     var recipesResponse: RecipeResponse?

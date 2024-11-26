@@ -24,31 +24,29 @@ final class RecipeListViewModel: ObservableObject {
         var title: String { rawValue.capitalized }
     }
 
-    func fetchAllRecipes() {
+    func fetchAllRecipes() async {
         guard !isLoading else { return }
-        isLoading = true
-        Task {
-            do {
-                let recipeResponse: RecipeResponse = try await {
-                    switch recipeEndpointOption {
-                    case .main: return try await api.getRecipes()
-                    case .malformed: return try await api.getMalformedRecipes()
-                    case .empty: return try await api.getEmptyRecipes()
-                    }
-                }()
-                await MainActor.run {
-                    self.recipes = recipeResponse.recipes
-                    self.loadingError = nil
+        await MainActor.run { isLoading = true }
+        do {
+            let recipeResponse: RecipeResponse = try await {
+                switch recipeEndpointOption {
+                case .main: return try await api.getRecipes()
+                case .malformed: return try await api.getMalformedRecipes()
+                case .empty: return try await api.getEmptyRecipes()
                 }
-            } catch {
-                await MainActor.run {
-                    self.recipes = []
-                    self.loadingError = error
-                }
-            }
+            }()
             await MainActor.run {
-                self.isLoading = false
+                self.recipes = recipeResponse.recipes
+                self.loadingError = nil
             }
+        } catch {
+            await MainActor.run {
+                self.recipes = []
+                self.loadingError = error
+            }
+        }
+        await MainActor.run {
+            self.isLoading = false
         }
     }
 }

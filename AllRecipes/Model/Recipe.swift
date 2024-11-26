@@ -21,14 +21,15 @@ struct Recipe: Decodable, Identifiable {
         uuid.uuidString
     }
     
-    enum CodingKeys: String, CodingKey {
-        case cuisine
-        case name
-        case photoURLLarge = "photo_url_large"
-        case photoURLSmall = "photo_url_small"
-        case uuid
-        case sourceURL = "source_url"
-        case youtubeURL = "youtube_url"
+    init(cuisine: String, name: String, uuid: UUID = UUID()) {
+        self.cuisine = cuisine
+        self.name = name
+        self.uuid = uuid
+        
+        self.photoURLLarge = nil
+        self.photoURLSmall = nil
+        self.sourceURL = nil
+        self.youtubeURL = nil
     }
     
     init(from decoder: any Decoder) throws {
@@ -40,5 +41,15 @@ struct Recipe: Decodable, Identifiable {
         self.photoURLSmall = try? container.decodeIfPresent(URL.self, forKey: .photoURLSmall)
         self.sourceURL = try? container.decodeIfPresent(URL.self, forKey: .sourceURL)
         self.youtubeURL = try? container.decodeIfPresent(URL.self, forKey: .youtubeURL)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case cuisine
+        case name
+        case photoURLLarge = "photo_url_large"
+        case photoURLSmall = "photo_url_small"
+        case uuid
+        case sourceURL = "source_url"
+        case youtubeURL = "youtube_url"
     }
 }
