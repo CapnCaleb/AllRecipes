@@ -11,11 +11,12 @@ import Testing
 @testable import AllRecipes
 
 struct FileManagerDataCachingTests {
+    let mockCacheName = "MockCache"
     
     @Test("Testing inits for different init options")
     func initalSetup() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching()
+        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: mockCacheName)
         
         #expect(cache != nil)
     }
@@ -23,7 +24,7 @@ struct FileManagerDataCachingTests {
     @Test("Test Caching Data Success")
     func cachDataSuccess() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching()
+        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: mockCacheName)
         
         let testData = "Hello, Cache!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource1")!
@@ -38,7 +39,7 @@ struct FileManagerDataCachingTests {
     @Test("Test Fetching Data Success")
     func fetchDataSuccess() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching()
+        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: mockCacheName)
         
         let testData = "Hello, Fetch!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource2")!
@@ -54,7 +55,7 @@ struct FileManagerDataCachingTests {
     @Test("Test Clearing Cache")
     func clearCache() async throws {
         let mockFileManager: MockFileManager = MockFileManager()
-        let cache: FileManagerDataCaching = try FileManagerDataCaching()
+        let cache: FileManagerDataCaching = try FileManagerDataCaching(fileManager: mockFileManager, cacheName: mockCacheName)
         
         let testData = "Hello, Clear!".data(using: .utf8)!
         let testURL = URL(string: "https://example.com/resource3")!
