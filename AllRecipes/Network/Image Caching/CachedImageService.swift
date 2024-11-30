@@ -10,10 +10,12 @@ import UIKit
 public actor CachedImageService {
     static let shared = CachedImageService()
     private var iconCache = [String : UIImage]()
+    private var cachedItemNames = [String]()
     private let fileManagerCache: FileManagerDataCaching
+    private let cacheItemLimit: Int
     
-    
-    public init() {
+    public init(cacheItemLimit: Int = 50) {
+        self.cacheItemLimit = cacheItemLimit
         self.fileManagerCache = try! FileManagerDataCaching()
     }
     
@@ -62,7 +64,16 @@ extension CachedImageService {
 //MARK: Caching
 extension CachedImageService {
     private func cacheImageInDictionary(url: URL, image: UIImage) async {
-        self.iconCache[url.hashedName()] = image
+        let hashedName = url.hashedName()
+        self.iconCache[hashedName] = image
+        await manageCache(hashName: hashedName)
+    }
+    
+    private func manageCache(hashName: String) async {
+        cachedItemNames.insert(hashName, at: 0)
+        guard cachedItemNames.count >= cacheItemLimit else { return }
+        guard let oldestItem = cachedItemNames.popLast() else { return }
+        iconCache[oldestItem] = nil
     }
 }
 
